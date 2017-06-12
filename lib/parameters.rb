@@ -1,3 +1,5 @@
+module Labmouse
+
 class Parameters
   include Enumerable
   attr_reader :params
@@ -27,4 +29,6 @@ class Parameters
   def each(start_index=0, stop_index=-1)
     @params.each(start_index, stop_index)
   end
+end
+
 end
