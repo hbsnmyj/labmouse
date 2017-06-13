@@ -1,4 +1,4 @@
-#!/bin/ruby
+#!/bin/env ruby
 
 require "test/unit"
 require "labmouse"

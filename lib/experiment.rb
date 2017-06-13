@@ -26,6 +26,7 @@ def self.run_cmd(hcmd, params)
 end
 
 class ExperimentRun
+  attr_reader :params,:commands
   def initialize(params, commands)
     @params = params
     @commands = commands
@@ -82,7 +83,7 @@ class ExperimentRuns
   end
 
   def dump_run_script(path, runfile)
-    script = "#!/bin/ruby
+    script = "#!/bin/env ruby
       require 'labmouse'
       runs = Labmouse::ExperimentRuns.from_file('#{runfile}')
       runs.run(Integer(ARGV[0]),ARGV[1])
@@ -90,26 +91,31 @@ class ExperimentRuns
     File.open(path, 'w') do |file|
       file.puts(script)
     end
-    FileUtils.chmod(0700, path)
+    File.chmod(0700, path)
+  end
+
+  def [](index)
+    return @runs[index]
   end
 end
 
 class LocalRunner
   def initialize(runs, cooldown = 0)
     @runs = runs
+    @cooldown = cooldown
   end
 
   def create_job(prefix, indexes, ids)
     runs.dump_file(prefix + '.config')
     job_script = prefix + '_job.rb'
+    job_script = File.absolute_path(job_script)
     runs.dump_run_script(job_script)
     File.open(path, 'w') do |file|
       script = '#!/bin/bash\n\n'
-      job_script = File.absolute_path(job_script)
       has_prev = false
       indexes.lazy.zip(ids).each{|index,id|
         if cooldown != 0 and has_prev
-          scripts += "sleep #{cooldown}\n"
+          scripts += "sleep #{@cooldown}\n"
         end
         scripts += "#{job_script} #{index} #{id}\n\n"
         has_prev = true
