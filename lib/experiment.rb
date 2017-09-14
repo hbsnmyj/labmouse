@@ -97,6 +97,10 @@ class ExperimentRuns
   def [](index)
     return @runs[index]
   end
+
+  def length()
+    return @runs.length
+  end
 end
 
 class LocalRunner
@@ -106,21 +110,24 @@ class LocalRunner
   end
 
   def create_job(prefix, indexes, ids)
-    runs.dump_file(prefix + '.config')
+    path = "#{prefix}_run.sh"
+    @runs.dump_file(prefix + '.config')
     job_script = prefix + '_job.rb'
     job_script = File.absolute_path(job_script)
-    runs.dump_run_script(job_script)
+    @runs.dump_run_script(job_script, prefix + '.config')
     File.open(path, 'w') do |file|
-      script = '#!/bin/bash\n\n'
+      scripts = "#!/bin/bash\n\n"
       has_prev = false
       indexes.lazy.zip(ids).each{|index,id|
-        if cooldown != 0 and has_prev
+        if @cooldown != 0 and has_prev
           scripts += "sleep #{@cooldown}\n"
         end
         scripts += "#{job_script} #{index} #{id}\n\n"
         has_prev = true
       }
+      file.write(scripts)
     end
+    File.chmod(0700, path)
   end
 end
 
