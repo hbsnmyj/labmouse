@@ -111,12 +111,11 @@ class ExperimentRuns
 end
 
 class LocalRunner
-  def initialize(runs, cooldown = 0)
+  def initialize(runs)
     @runs = runs
-    @cooldown = cooldown
   end
 
-  def create_job(prefix, indexes, ids)
+  def create_job(prefix, indexes, ids, cooldown)
     path = "#{prefix}_run.sh"
     @runs.dump_file(prefix + '.config')
     job_script = prefix + '_job.rb'
@@ -126,8 +125,8 @@ class LocalRunner
       scripts = "#!/bin/bash\n\n"
       has_prev = false
       indexes.lazy.zip(ids).each{|index,id|
-        if @cooldown != 0 and has_prev
-          scripts += "sleep #{@cooldown}\n"
+        if cooldown != 0 and has_prev
+          scripts += "sleep #{cooldown}\n"
         end
         scripts += "#{job_script} #{index} #{id}\n\n"
         has_prev = true
