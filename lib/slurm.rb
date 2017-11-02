@@ -46,6 +46,10 @@ class SLURM
       scripts += "#SBATCH -e #{params[:output_dir]}/slurm-%j.out\n"
     end
 
+    if params.has_key? :time_limit
+        scripts += "#SBATCH -t #{params[:time_limit]}\n"
+    end
+
     scripts += "\n#{cmd}\n"
 
     if cooldown != 0
@@ -89,7 +93,7 @@ class SLURM
 
   def self.sbatch_command(afterok, afterany, hold, singleton)
     cmd = 'sbatch'
-    cmd += ' -H' if hold
+#    cmd += ' -H' if hold
     dependency_list = []
     dependency_list << 'afterok:' + afterok.join(':') if afterok.any?
     dependency_list << 'afterany:' + afterany.join(':') if afterany.any?

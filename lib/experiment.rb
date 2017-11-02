@@ -1,5 +1,6 @@
 require 'benchmark'
 require 'yaml'
+require 'open3'
 
 module Labmouse
 
@@ -20,7 +21,13 @@ def self.run_cmd(hcmd, params)
   command_text = fhash(hcmd[:text], params)
   puts "CMD=#{command_text}"
   time = Benchmark.measure {
-    system(ENV['SHELL'], "-c", command_text)
+      Open3.popen2e(command_text) do |stdin, stdoe, wait_thr|
+          while line = stdoe.gets
+              puts line
+          end
+          exit_status = wait_thr.value
+          puts "EXIT_STATUS=#{exit_status}"
+      end
   }
   puts "TIME=#{time.real}"
 end
