@@ -135,8 +135,8 @@ class SLURMRunner
     @runs.dump_run_script(job_script, run_file)
     job_ids = []
     jobs.each{|job|
-      cmd = job.each {
-        "#{job_script} #{job[0]} #{job[1]}"
+      cmd = job.map{ |j|
+        "#{job_script} #{j[0]} #{j[1]}"
       }.join("\n")
       script = SLURM.generate_job(slurm_param, cmd, cooldown)
       hold = !job_ids.any?
