@@ -127,6 +127,30 @@ class SLURMRunner
     }
     SLURM.release(job_ids[0])
   end
+
+  def submit_combine_jobs(prefix, slurm_param, jobs, cooldown, singleton = false)
+    run_file = prefix + '.config'
+    job_script = File.absolute_path(prefix + '_job.rb')
+    @runs.dump_file(prefix + '.config')
+    @runs.dump_run_script(job_script, run_file)
+    job_ids = []
+    jobs.each{|job|
+      cmd = job.each {
+        "#{job_script} #{job[0]} #{job[1]}"
+      }.join("\n")
+      script = SLURM.generate_job(slurm_param, cmd, cooldown)
+      hold = !job_ids.any?
+      if hold
+          afterany = []
+      else
+          afterany = job_ids[-1..-1]
+      end
+      job_id = SLURM.submit_job(script, [], afterany, hold, singleton)
+      job_ids.push(job_id)
+      sleep 1
+    }
+    SLURM.release(job_ids[0])
+  end
 end
 
 end
