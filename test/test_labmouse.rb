@@ -73,7 +73,7 @@ END RUN test2
 
   def test_run_ruby
     command_list = [
-        [(lambda {|params| puts params}).to_source, "ruby", "echo1", ""],
+        [(lambda {|params, environment| puts params}).to_source, "ruby", "echo1", ""],
     ]
     exp = ExperimentRun.new({:a=>1, :b=>2},command_list)
     runs = ExperimentRuns.new([exp, exp])

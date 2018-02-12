@@ -17,7 +17,7 @@ def self.fhash(string, hash)
   return string
 end
 
-def self.run_cmd(hcmd, params)
+def self.run_cmd(hcmd, params, environment)
   command_text = fhash(hcmd[:text], params)
   puts "CMD=#{command_text}"
   time = Benchmark.measure {
@@ -32,11 +32,11 @@ def self.run_cmd(hcmd, params)
   puts "TIME=#{time.real}"
 end
 
-def self.run_ruby(hcmd, params)
+def self.run_ruby(hcmd, params, environment)
   l = eval(hcmd[:text])
   puts "START RUBYCODE C\n#{hcmd[:text]}\nEND RUBYCODE C"
   time = Benchmark.measure {
-    l.call(params)
+    l.call(params, environment)
   }
   puts "TIME=#{time.real}"
 end
@@ -52,13 +52,14 @@ class ExperimentRun
     puts "START RUN #{run_id}"
     puts "RUNSTART=" + Time.now.inspect
     puts "RUNPARAM=#{@params}"
+    environment = {}
     @commands.each{|cmd|
       hcmd = Hash[[:text, :type, :name, :options].zip(cmd)]
       if hcmd[:name] != ""
         puts "START COMMAND #{hcmd[:name]}"
       end
       func_name = "run_#{hcmd[:type]}"
-      Labmouse.send(func_name, hcmd, @params)
+      Labmouse.send(func_name, hcmd, @params, environment)
       if hcmd[:name] != ""
         puts "END COMMAND #{hcmd[:name]}"
       end
