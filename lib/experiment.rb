@@ -32,6 +32,15 @@ def self.run_cmd(hcmd, params)
   puts "TIME=#{time.real}"
 end
 
+def self.run_ruby(hcmd, params)
+  l = eval(hcmd[:text])
+  puts "START RUBYCODE C\n#{hcmd[:text]}\nEND RUBYCODE C"
+  time = Benchmark.measure {
+    l.call(params)
+  }
+  puts "TIME=#{time.real}"
+end
+
 class ExperimentRun
   attr_reader :params,:commands
   def initialize(params, commands)

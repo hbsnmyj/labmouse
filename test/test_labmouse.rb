@@ -2,6 +2,7 @@
 
 require "test/unit"
 require "labmouse"
+require "proc_to_ast"
 
 include Labmouse
 
@@ -68,5 +69,19 @@ END RUN test2
     runs.dump_run_script('test.rb', 'test.config')
     FileUtils::remove('test.config')
     FileUtils::remove('test.rb')
+  end
+
+  def test_run_ruby
+    command_list = [
+        [(lambda {|params| puts params}).to_source, "ruby", "echo1", ""],
+    ]
+    exp = ExperimentRun.new({:a=>1, :b=>2},command_list)
+    runs = ExperimentRuns.new([exp, exp])
+    runner = LocalRunner.new(runs)
+    runs.dump_file('test.config')
+    runs.dump_run_script('test.rb', 'test.config')
+    runner.create_job("test",[0], ["0"], 0)
+#    FileUtils::remove('test.config')
+#    FileUtils::remove('test.rb')
   end
 end
