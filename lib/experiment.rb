@@ -36,7 +36,7 @@ def self.run_ruby(hcmd, params, environment)
   l = eval(hcmd[:text])
   puts "START RUBYCODE C\n#{hcmd[:text]}\nEND RUBYCODE C"
   time = Benchmark.measure {
-    l.call(params, environment)
+    l.call(params, environment, hcmd[:options])
   }
   puts "TIME=#{time.real}"
 end
