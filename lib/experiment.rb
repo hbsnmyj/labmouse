@@ -41,6 +41,27 @@ def self.run_ruby(hcmd, params, environment)
   puts "TIME=#{time.real}"
 end
 
+def self.execute_hcmd(cmd, params, environment)
+  hcmd = Hash[[:text, :type, :name, :options].zip(cmd)]
+  puts "START COMMAND #{hcmd[:name]}" if hcmd[:name] != ''
+  func_name = "run_#{hcmd[:type]}"
+  p hcmd
+  Labmouse.send(func_name, hcmd, params, environment)
+  puts "END COMMAND #{hcmd[:name]}" if hcmd[:name] != ''
+end
+
+def self.run_array(hcmd, params, environment)
+  hcmd[:text].each do |cmd|
+    p cmd
+    self.execute_hcmd(cmd, params, environment)
+  end
+end
+
+def self.run_condition(hcmd, params, environment)
+  l = eval(hcmd[:options])
+  self.execute_hcmd(hcmd[:text][l],params, environment)
+end
+
 class ExperimentRun
   attr_reader :params,:commands
   def initialize(params, commands)
@@ -54,20 +75,11 @@ class ExperimentRun
     puts "RUNPARAM=#{@params}"
     environment = {}
     @commands.each{|cmd|
-      hcmd = Hash[[:text, :type, :name, :options].zip(cmd)]
-      if hcmd[:name] != ""
-        puts "START COMMAND #{hcmd[:name]}"
-      end
-      func_name = "run_#{hcmd[:type]}"
-      Labmouse.send(func_name, hcmd, @params, environment)
-      if hcmd[:name] != ""
-        puts "END COMMAND #{hcmd[:name]}"
-      end
+      Labmouse.execute_hcmd(cmd, @params, environment)
     }
     puts "RUNEND=" + Time.now.inspect
     puts "END RUN #{run_id}"
   end
-
 end
 
 class ExperimentRuns

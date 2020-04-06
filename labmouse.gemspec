@@ -10,5 +10,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "proc_to_ast", [">= 0"]
   s.add_runtime_dependency "json", [">= 0"]
   s.add_runtime_dependency "csv", [">= 0"]
+  s.add_runtime_dependency "test-unit", [">= 0"]
   s.summary = 'A very simple experimental framework'
 end

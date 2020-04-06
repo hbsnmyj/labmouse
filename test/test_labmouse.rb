@@ -23,6 +23,28 @@ class TestLabmouse < Test::Unit::TestCase
     exp.run("test1")
   end
 
+  def test_array
+    command_list = [
+        [[
+             ["echo HELLO %{:a} %{:b} %{:a}", "cmd", "echo2", ""],
+             ["echo HELLO %{:a} %{:b} %{:a}", "cmd", "echo1", ""]
+         ], "array", "array1", ""]
+    ]
+    exp = ExperimentRun.new({:a=>1, :b=>2},command_list)
+    exp.run("test1")
+  end
+
+  def test_condition
+    command_list = [
+        [[
+             ["echo HELLO %{:a} %{:b} %{:a}", "cmd", "echo2", ""],
+             ["echo HELLO %{:a} %{:b} %{:a}", "cmd", "echo1", ""]
+         ], "condition", "condition1", "if params[:a] == 1 then 0 else 1 end"]
+    ]
+    exp = ExperimentRun.new({:a=>1, :b=>2},command_list)
+    exp.run("test1")
+  end
+
   def test_parse_block
     text = "START RUN run01\nSTART LABEL test\nPARAMS=test\nEND LABEL\nSTART LABEL asdlf\nSTART COMMAND TEST\nPARAMS=2\nEND COMMAND\nEND LABEL\nSTART COMMAND test\n\nEND COMMAND\nEND RUN 01\n"
     parsed = grep_block(text)[0]
